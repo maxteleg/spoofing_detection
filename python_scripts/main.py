@@ -21,29 +21,29 @@ def calc_hist(img):
     return np.array(histogram)
 
 
-ap = argparse.ArgumentParser()
-ap.add_argument("-n", "--name", required=True, help="name of trained model to perform spoofing detection")
-ap.add_argument("-d", "--device", required=True, help="camera identifier/video to acquire the image")
-ap.add_argument("-t", "--threshold", required=False, help="threshold used for the classifier to decide between genuine and a spoof attack")
-args = vars(ap.parse_args())
+# ap = argparse.ArgumentParser()
+# ap.add_argument("-n", "--name", required=True, help="name of trained model to perform spoofing detection")
+# ap.add_argument("-d", "--device", required=True, help="camera identifier/video to acquire the image")
+# ap.add_argument("-t", "--threshold", required=False, help="threshold used for the classifier to decide between genuine and a spoof attack")
+# args = vars(ap.parse_args())
 
 if __name__ == "__main__":
 
     # # Load model
     clf = None
     try:
-        clf = joblib.load(args["name"])
+        clf = joblib.load('/Users/yym/work/dl/spoofing_detection/trained_models/replay_attack_trained_models/replay-attack_ycrcb_luv_extraTreesClassifier.pkl')
     except IOError as e:
-        print "Error loading model <"+args["name"]+">: {0}".format(e.strerror)
+        print("Error loading model <"+">: {0}".format(e.strerror))
         exit(0)
 
     # # Open the camera
-    if '.' in args["device"]:
-        cap = cv2.VideoCapture(args["device"])
-    else:
-        cap = cv2.VideoCapture(int(args["device"]))
+    # if '.' in args["device"]:
+    #     cap = cv2.VideoCapture(args["device"])
+    # else:
+    cap = cv2.VideoCapture(0)
     if not cap.isOpened():
-        print "Error opening camera"
+        print("Error opening camera")
         exit(0)
 
     width = 320
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
     # # Initialize face detector
-    cascPath = "haarcascade_frontalface_default.xml"
+    cascPath = "/Users/yym/work/dl/spoofing_detection/python_scripts/haarcascade_frontalface_default.xml"
     faceCascade = cv2.CascadeClassifier(cascPath)
 
     sample_number = 1
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     while True:
         ret, img_bgr = cap.read()
         if ret is False:
-            print "Error grabbing frame from camera"
+            print("Error grabbing frame from camera")
             break
 
         img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
             point = (x, y-5)
 
-            print measures, np.mean(measures)
+            print(measures, np.mean(measures))
             if 0 not in measures:
                 text = "True"
                 if np.mean(measures) >= 0.7:
